@@ -1,5 +1,7 @@
 use std::time::{Instant, Duration};
 
+use tokio::join;
+
 async fn task_async(task: &str, seconds: u64) {
     println!("Start to do a {task}...");
     tokio::time::sleep(Duration::from_secs(seconds)).await;
@@ -9,11 +11,7 @@ async fn task_async(task: &str, seconds: u64) {
 async fn main() {
     let start = Instant::now();
 
-    let a = tokio::spawn(task_async("Homework", 5));
-    let b = tokio::spawn(task_async("Learn_rust", 4));
-
-    a.await.unwrap();
-    b.await.unwrap();
+    join!(task_async("homework", 2), task_async("Rust", 3));
 
     println!("Time elapsed: {:?}", start.elapsed());
 }
