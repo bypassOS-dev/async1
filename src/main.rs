@@ -1,17 +1,21 @@
-use std::time::{Instant, Duration};
+use std::time::Duration;
+use tokio::sync::mpsc;
 
-use tokio::join;
-
-async fn task_async(task: &str, seconds: u64) {
-    println!("Start to do a {task}...");
-    tokio::time::sleep(Duration::from_secs(seconds)).await;
-    println!("A task {task} was did!");
-}
 #[tokio::main]
 async fn main() {
-    let start = Instant::now();
+    println!("Start working...");
 
-    join!(task_async("homework", 2), task_async("Rust", 3));
+    let (tx, mut rx) = mpsc::channel(32);
 
-    println!("Time elapsed: {:?}", start.elapsed());
+    tokio::spawn(async move {
+        for i in 1..=5 {
+            tokio::time::sleep(Duration::from_millis(500)).await;
+            let result = i * 10;
+            tx.send(result).await.unwrap();
+            println!("a programm send a data!");
+        }
+    });
+    while let Some(value) = rx.recv().await {
+        println!("A main function is geting a data: {value}");
+    }
 }
