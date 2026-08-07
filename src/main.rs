@@ -1,21 +1,26 @@
-use std::time::Duration;
-use tokio::sync::mpsc;
-
+use tokio::{io::AsyncReadExt, net::{TcpListener, TcpStream}};
 #[tokio::main]
 async fn main() {
-    println!("Start working...");
+    let connect = TcpListener::bind("127.0.0.1:8080").await.unwrap();
+    loop {
+        let (mut socet, addr) = connect.accept().await.unwrap();
 
-    let (tx, mut rx) = mpsc::channel(32);
-
-    tokio::spawn(async move {
-        for i in 1..=5 {
-            tokio::time::sleep(Duration::from_millis(500)).await;
-            let result = i * 10;
-            tx.send(result).await.unwrap();
-            println!("a programm send a data!");
-        }
-    });
-    while let Some(value) = rx.recv().await {
-        println!("A main function is geting a data: {value}");
     }
+}
+async fn copy_data(mut from: TcpStream, to:TcpStream) {
+    let mut buffer = [0u8; 1024];
+    loop {
+        let n = match from.read(&mut buffer).await  {
+            Ok(0) => {
+
+            },
+            Ok(n) => {
+
+            }
+            Err(e) => {
+
+            }
+        };
+    };
+    
 }
