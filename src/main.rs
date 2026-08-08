@@ -3,7 +3,7 @@ use tokio::{io::{AsyncReadExt, AsyncWriteExt}, net::{TcpListener, TcpStream}};
 async fn main() {
     let connect = TcpListener::bind("127.0.0.1:8080").await.unwrap();
     loop {
-        let (mut socet, addr) = connect.accept().await.unwrap();
+        let (mut client_socet, client_addr) = connect.accept().await.unwrap();
 
     }
 }
@@ -28,4 +28,9 @@ async fn copy_data(mut from: TcpStream, mut to:TcpStream) {
         println!("Was sent {n} bytes");
     };
     
+}
+async fn handle_connect(client_socet: TcpStream, client_addr: String) {
+    let server_socet = TcpStream::connect(&client_addr).await.unwrap();
+    let (client_read, client_write) = client_socet.into_split();
+    let (server_read, server_write) = server_socet.into_split();
 }
