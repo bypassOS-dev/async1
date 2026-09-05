@@ -1,15 +1,15 @@
-use thiserror::Error;
-use tokio::net::TcpStream;
-use tokio;
-#[derive(Debug, Error)]
-enum MyError {
-    #[error("[!!!]Error of network")]
-    Network,
-    #[error("[!!!]Error of Timeout")]
-    TimeOut,
-    #[error("[!!!]Error of data")]
-    InvalidData,
-}
-async fn main() {
-    let conect = TcpStream::connect("127.0.0.1:9999")
+use nfq::{Queue, Verdict};
+fn main() -> Result<(), Box<dyn std::error::Error>>{
+    let mut queue = Queue::open()?;
+    queue.bind(0)?;
+
+    loop {
+        let mut msg = queue.recv()?;
+        let payload = msg.get_payload();
+
+        println!("Got a packet! Size: {} bytes", payload.len());
+
+        msg.set_verdict(Verdict::Accept);
+        queue.verdict(msg)?;
+    }
 }
